@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="obsidian">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lumina Flipbook • เล่ม.pdf</title>
+
+  <!-- Typography: Sarabun & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="app-root">
+
+    <!-- 1. TOP NAVIGATION BAR -->
+    <header class="top-bar" id="top-bar" role="banner">
+      <div class="top-bar-left">
+        <div class="doc-brand">
+          <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span class="doc-title" id="doc-title">เล่ม.pdf</span>
+        </div>
+        <span class="doc-badge" id="doc-badge">571 หน้า</span>
+      </div>
+
+      <div class="top-bar-center">
+        <!-- Table of Contents -->
+        <button class="tool-btn" id="btn-toc" aria-label="สารบัญ (C)" data-tooltip="สารบัญ (C)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Thumbnails -->
+        <button class="tool-btn" id="btn-thumbnails" aria-label="ภาพตัวอย่างหน้า (T)" data-tooltip="ภาพตัวอย่างหน้า (T)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        </button>
+
+        <!-- Bookmarks -->
+        <button class="tool-btn" id="btn-bookmarks" aria-label="ที่คั่นหน้า (B)" data-tooltip="ที่คั่นหน้า (B)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="top-bar-right">
+        <!-- Sound Effect Toggle -->
+        <button class="tool-btn active" id="btn-sound" aria-label="เปิด/ปิดเสียงเปิดหน้า" data-tooltip="เสียงเปิดหน้า">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+
+        <!-- Auto-Play Slideshow -->
+        <button class="tool-btn" id="btn-autoplay" aria-label="เล่นอัตโนมัติ (Space)" data-tooltip="เปิดหน้าอัตโนมัติ (Space)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </button>
+
+        <!-- Theme Picker -->
+        <button class="tool-btn" id="btn-theme" aria-label="เปลี่ยนธีมการอ่าน" data-tooltip="เปลี่ยนธีม">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <!-- Shortcuts Help -->
+        <button class="tool-btn" id="btn-help" aria-label="ปุ่มลัดคีย์บอร์ด (?)" data-tooltip="ปุ่มลัดคีย์บอร์ด">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+
+        <!-- Fullscreen -->
+        <button class="tool-btn" id="btn-fullscreen" aria-label="เต็มจอ (F)" data-tooltip="เต็มจอ (F)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Theme Dropdown Menu -->
+      <div class="theme-menu" id="theme-menu" role="menu">
+        <div class="theme-option" data-theme="obsidian" role="menuitem">
+          <span class="theme-swatch" style="background: #0f172a;"></span>
+          <span>Midnight Obsidian (มืด)</span>
+        </div>
+        <div class="theme-option" data-theme="parchment" role="menuitem">
+          <span class="theme-swatch" style="background: #2e2019;"></span>
+          <span>Warm Parchment (ถนอมสายตา)</span>
+        </div>
+        <div class="theme-option" data-theme="emerald" role="menuitem">
+          <span class="theme-swatch" style="background: #063426;"></span>
+          <span>Emerald Luxury (หรูหรา)</span>
+        </div>
+        <div class="theme-option" data-theme="light" role="menuitem">
+          <span class="theme-swatch" style="background: #ffffff; border-color: #cbd5e1;"></span>
+          <span>Clean Studio (สว่าง)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. FLIPBOOK MAIN STAGE -->
+    <main class="stage-container" id="stage-container" role="main">
+      <!-- Floating Navigation Arrows -->
+      <button class="nav-arrow-floating nav-arrow-prev disabled" id="btn-prev-floating" aria-label="หน้าก่อนหน้า (←)" data-tooltip="หน้าก่อนหน้า (←)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <button class="nav-arrow-floating nav-arrow-next" id="btn-next-floating" aria-label="หน้าถัดไป (→)" data-tooltip="หน้าถัดไป (→)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Viewport & Book Container -->
+      <div class="book-viewport" id="book-viewport">
+        <div class="book-edge-shadow-left"></div>
+        <div id="flipbook"></div>
+        <div class="spine-overlay" id="spine-overlay"></div>
+        <div class="book-edge-shadow-right"></div>
+      </div>
+    </main>
+
+    <!-- 3. BOTTOM FLOATING CONTROL DOCK -->
+    <footer class="bottom-dock" id="bottom-dock" role="toolbar" aria-label="แถบควบคุมการอ่าน">
+      <!-- Prev Button -->
+      <button class="tool-btn" id="btn-prev" aria-label="หน้าก่อนหน้า">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Page Jump Box -->
+      <div class="page-jump-container">
+        <span>หน้า</span>
+        <input type="number" id="page-input" class="page-jump-input" min="1" max="571" value="1" aria-label="หมายเลขหน้าที่ต้องการไป">
+        <span>/ <span id="total-pages">571</span></span>
+      </div>
+
+      <!-- Next Button -->
+      <button class="tool-btn" id="btn-next" aria-label="หน้าถัดไป">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <!-- Slider Track -->
+      <div class="slider-container" id="slider-container">
+        <div class="slider-tooltip" id="slider-tooltip">หน้า 1</div>
+        <input type="range" class="page-slider" id="page-slider" min="1" max="571" value="1" aria-label="แถบเลื่อนหน้า">
+      </div>
+
+      <div class="dock-divider"></div>
+
+      <!-- Zoom Widget -->
+      <div class="zoom-widget">
+        <button class="tool-btn" id="btn-zoom-out" aria-label="ย่อขนาด (-)" data-tooltip="ย่อ (-)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+        </button>
+
+        <span class="zoom-badge" id="zoom-level-text">100%</span>
+
+        <button class="tool-btn" id="btn-zoom-in" aria-label="ขยายขนาด (+)" data-tooltip="ขยาย (+)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="11" y1="8" x2="11" y2="14"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+        </button>
+
+        <button class="tool-btn" id="btn-zoom-reset" aria-label="พอดีหน้าจอ (0)" data-tooltip="พอดีหน้าจอ (0)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h6v6"></path>
+            <path d="M9 21H3v-6"></path>
+            <path d="M21 3l-7 7"></path>
+            <path d="M3 21l7-7"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="dock-divider"></div>
+
+      <!-- View Mode (Single / Double page) -->
+      <button class="tool-btn" id="btn-view-mode" aria-label="สลับโหมด 1 หน้า / 2 หน้า" data-tooltip="สลับโหมดหน้าเดี่ยว/หน้าคู่">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <!-- Download Button -->
+      <button class="tool-btn" id="btn-download" aria-label="ดาวน์โหลดไฟล์ PDF" data-tooltip="ดาวน์โหลด PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+      </button>
+    </footer>
+
+    <!-- 4. SLIDING DRAWERS & BACKDROP -->
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+    <!-- Thumbnails Drawer (Bottom Filmstrip) -->
+    <div class="drawer drawer-bottom" id="drawer-thumbnails" role="dialog" aria-label="ภาพตัวอย่างทุกหน้า">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>ภาพตัวอย่างหน้า (Thumbnails)</span>
+        </div>
+        <button class="tool-btn drawer-close-btn" aria-label="ปิด">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="drawer-thumbnails-track" id="thumbnails-track">
+        <!-- Lazy-rendered thumbnail cards -->
+      </div>
+    </div>
+
+    <!-- Table of Contents Drawer (Side) -->
+    <div class="drawer drawer-side" id="drawer-toc" role="dialog" aria-label="สารบัญเอกสาร">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <span>สารบัญ (Table of Contents)</span>
+        </div>
+        <button class="tool-btn drawer-close-btn" aria-label="ปิด">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="drawer-toolbar">
+        <div class="toc-search-container">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="toc-search" class="toc-search-input" placeholder="ค้นหาตัวชี้วัด เช่น Sepsis, Stroke, KPI..." aria-label="ค้นหาสารบัญ">
+          <button id="toc-search-clear" class="toc-search-clear" aria-label="ล้างคำค้นหา" style="display: none;">&times;</button>
+        </div>
+        <div class="toc-filter-pills">
+          <button class="filter-pill active" data-filter="all">ทั้งหมด (428)</button>
+          <button class="filter-pill" data-filter="kpi">เฉพาะ KPI (128)</button>
+          <button class="filter-pill" data-filter="okr">เฉพาะ OKR (297)</button>
+          <button class="filter-pill" data-filter="intro">ส่วนนำ</button>
+        </div>
+      </div>
+      <div class="drawer-body">
+        <ul class="toc-list" id="toc-list">
+          <!-- Dynamically populated from js/toc-data.js -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bookmarks & Notes Drawer (Side) -->
+    <div class="drawer drawer-side" id="drawer-bookmarks" role="dialog" aria-label="ที่คั่นหน้าและโน้ต">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>ที่คั่นหน้า & โน้ตบันทึก</span>
+        </div>
+        <button class="tool-btn drawer-close-btn" aria-label="ปิด">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="drawer-body">
+        <div class="bookmark-form">
+          <input type="text" id="bookmark-input" class="bookmark-input" placeholder="บันทึกข้อความย่อ..." aria-label="ข้อความโน้ตย่อ">
+          <button class="btn-primary" id="btn-add-bookmark">คั่นหน้านี้</button>
+        </div>
+        <ul class="bookmark-list" id="bookmarks-list">
+          <!-- Dynamically populated from localStorage -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- 5. KEYBOARD SHORTCUTS MODAL -->
+    <div class="modal-overlay" id="modal-shortcuts" role="dialog" aria-label="ปุ่มลัดคีย์บอร์ด">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 class="modal-title">ปุ่มลัดคีย์บอร์ด (Shortcuts)</h2>
+          <button class="tool-btn" id="modal-close-btn" aria-label="ปิด">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="shortcuts-grid">
+          <div class="shortcut-row">
+            <span>หน้าถัดไป</span>
+            <div><kbd>→</kbd> หรือ <kbd>PageDown</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>หน้าก่อนหน้า</span>
+            <div><kbd>←</kbd> หรือ <kbd>PageUp</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>หน้าแรกสุด (หน้าปก)</span>
+            <div><kbd>Home</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>หน้าสุดท้าย</span>
+            <div><kbd>End</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>โหมดเต็มจอ</span>
+            <div><kbd>F</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>ภาพตัวอย่าง (Thumbnails)</span>
+            <div><kbd>T</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>สารบัญ (TOC)</span>
+            <div><kbd>C</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>ที่คั่นหน้า (Bookmarks)</span>
+            <div><kbd>B</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>เล่นหน้าอัตโนมัติ</span>
+            <div><kbd>Space</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>ย่อ / ขยาย</span>
+            <div><kbd>+</kbd> / <kbd>-</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>ปิดหน้าต่าง / รีเซ็ต</span>
+            <div><kbd>Esc</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span>ซูมแบบเร็ว</span>
+            <div><kbd>ดับเบิ้ลคลิก</kbd></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. DRAG & DROP / FILE PICKER FALLBACK (CORS-Proof) -->
+    <div class="dropzone-overlay hidden" id="dropzone-overlay">
+      <div class="dropzone-card">
+        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <path d="M12 18v-6"></path>
+          <path d="M9 15l3-3 3 3"></path>
+        </svg>
+        <h2 class="dropzone-title">เปิดไฟล์ เล่ม.pdf</h2>
+        <p class="dropzone-desc">
+          ลากไฟล์ <strong>เล่ม.pdf</strong> มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์<br>
+          เพื่อเปิดอ่านในรูปแบบ 3D Flipbook ทันที
+        </p>
+        <div class="dropzone-hint">
+          💡 เคล็ดลับ: คุณสามารถดับเบิ้ลคลิกไฟล์ <code>run_flipbook.bat</code> ในโฟลเดอร์เพื่อเปิดอ่านอัตโนมัติโดยไม่ต้องเลือกไฟล์
+        </div>
+        <input type="file" id="file-input" accept="application/pdf" style="display: none;">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Core JavaScript Libraries -->
+  <script src="lib/pdf.min.js"></script>
+  <script src="lib/page-flip.browser.js"></script>
+  <script src="js/toc-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
