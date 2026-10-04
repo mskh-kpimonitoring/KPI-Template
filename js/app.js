@@ -1016,6 +1016,10 @@
         if (!isNaN(val)) jumpToPage(val);
       }
     });
+    dom.pageInput.addEventListener('change', () => {
+      const val = parseInt(dom.pageInput.value, 10);
+      if (!isNaN(val)) jumpToPage(val);
+    });
 
     // Slider scrubbing
     dom.pageSlider.addEventListener('input', (e) => {
@@ -1032,17 +1036,35 @@
     dom.btnZoomIn.addEventListener('click', zoomIn);
     dom.btnZoomOut.addEventListener('click', zoomOut);
     dom.btnZoomReset.addEventListener('click', resetZoom);
+    if (dom.zoomLevelText) {
+      dom.zoomLevelText.addEventListener('click', resetZoom);
+    }
     if (dom.btnViewMode) {
       dom.btnViewMode.addEventListener('click', toggleViewMode);
     }
 
-    // Double click to zoom / reset
+    // Double click to zoom / reset (Desktop)
     dom.bookViewport.addEventListener('dblclick', () => {
       if (state.zoomLevel > 1.0) resetZoom();
       else applyZoom(1.5);
     });
 
-    // Drag to pan when zoomed
+    // Mobile double-tap zoom
+    let lastTapTime = 0;
+    dom.bookViewport.addEventListener('touchend', (e) => {
+      if (e.changedTouches.length === 1 && !state.isPanning) {
+        const now = Date.now();
+        if (now - lastTapTime < 320) {
+          if (state.zoomLevel > 1.0) resetZoom();
+          else applyZoom(1.5);
+          lastTapTime = 0;
+        } else {
+          lastTapTime = now;
+        }
+      }
+    }, { passive: true });
+
+    // Drag to pan when zoomed (Mouse)
     dom.bookViewport.addEventListener('mousedown', (e) => {
       if (state.zoomLevel > 1.0) {
         state.isPanning = true;
@@ -1062,6 +1084,30 @@
     });
 
     window.addEventListener('mouseup', () => {
+      state.isPanning = false;
+      dom.bookViewport.classList.remove('is-dragging');
+    });
+
+    // Touch drag to pan when zoomed (Mobile)
+    dom.bookViewport.addEventListener('touchstart', (e) => {
+      if (state.zoomLevel > 1.0 && e.touches.length === 1) {
+        state.isPanning = true;
+        state.startX = e.touches[0].clientX - state.panX;
+        state.startY = e.touches[0].clientY - state.panY;
+        dom.bookViewport.classList.add('is-dragging');
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      resetZenTimer();
+      if (state.isPanning && state.zoomLevel > 1.0 && e.touches.length === 1) {
+        state.panX = e.touches[0].clientX - state.startX;
+        state.panY = e.touches[0].clientY - state.startY;
+        dom.bookViewport.style.transform = `scale(${state.zoomLevel}) translate(${state.panX}px, ${state.panY}px)`;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
       state.isPanning = false;
       dom.bookViewport.classList.remove('is-dragging');
     });
