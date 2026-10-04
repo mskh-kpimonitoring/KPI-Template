@@ -1348,53 +1348,335 @@ kbd {
 }
 
 /* --------------------------------------------------------------------------
-   10. Responsive Breakpoints
+   10. Responsive Breakpoints (Mobile UI/UX Pro Max)
    -------------------------------------------------------------------------- */
 @media (max-width: 900px) {
   .top-bar {
     top: var(--space-2);
     left: var(--space-2);
     right: var(--space-2);
-    padding: 0 var(--space-2);
+    padding: 0 var(--space-3);
+    height: 52px;
   }
   
   .doc-title {
     max-width: 140px;
   }
   
-  .slider-container {
-    display: none;
+  .slider-container,
+  .slider-container + .dock-divider {
+    display: none !important;
   }
   
   .bottom-dock {
     bottom: var(--space-2);
     padding: 0 var(--space-3);
     gap: var(--space-2);
+    height: 50px;
   }
   
   .drawer-side {
-    width: calc(100vw - 32px);
+    width: min(440px, calc(100vw - 24px));
+    left: var(--space-2);
+    top: var(--space-2);
+    bottom: var(--space-2);
+  }
+
+  .drawer-bottom {
+    left: var(--space-2);
+    right: var(--space-2);
+    bottom: var(--space-2);
   }
   
   .nav-arrow-floating {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
   }
   
   .nav-arrow-prev { left: var(--space-2); }
   .nav-arrow-next { right: var(--space-2); }
 }
 
-@media (max-width: 600px) {
-  .top-bar-center {
-    display: none;
+@media (max-width: 680px) {
+  /* Hide hover tooltips on touch screens */
+  [data-tooltip]::after {
+    display: none !important;
   }
-  
-  .zoom-widget {
-    display: none;
+
+  /* Top Bar Mobile Layout */
+  .top-bar {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    height: 48px;
+    padding: 0 8px;
+    gap: 4px;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between !important;
   }
-  
+
+  .top-bar-left {
+    flex: 0 0 auto;
+    gap: 6px;
+    display: flex;
+    align-items: center;
+  }
+
+  .doc-brand {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .doc-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .doc-title {
+    max-width: 70px;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .doc-badge {
+    display: none !important; /* Page count is displayed in the bottom dock */
+  }
+
+  /* TOP BAR CENTER: TOC, Thumbnails, Bookmarks MUST BE VISIBLE */
+  .top-bar-center {
+    display: flex !important;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  /* Prominent TOC button on mobile */
+  #btn-toc {
+    color: var(--accent-color);
+    background: rgba(99, 102, 241, 0.16);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+  }
+
+  /* TOP BAR RIGHT: Sound, Theme, Fullscreen */
+  .top-bar-right {
+    display: flex !important;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  /* Hide desktop-only controls on touch mobile */
+  #btn-help {
+    display: none !important; /* Keyboard shortcuts modal is unnecessary on touchscreen */
+  }
+
+  #btn-autoplay {
+    display: none !important; /* Save space for reader essentials */
+  }
+
+  /* Compact touch targets in header */
+  .top-bar .tool-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+  }
+
+  .top-bar .tool-btn svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* Bottom Dock Mobile Layout */
+  .bottom-dock {
+    bottom: 8px;
+    height: 46px;
+    padding: 0 6px;
+    gap: 2px;
+    max-width: calc(100vw - 12px);
+    width: auto;
+    border-radius: var(--radius-full);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bottom-dock .tool-btn {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .bottom-dock .tool-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .page-jump-container {
+    font-size: 12px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .page-jump-container > span:first-child {
+    display: none !important; /* Hide 'หน้า' text on mobile to save 30px */
+  }
+
+  .page-jump-input {
+    width: 34px;
+    height: 28px;
+    font-size: 12px;
+    padding: 0 1px;
+    text-align: center;
+  }
+
+  /* ZOOM WIDGET: FULLY VISIBLE & USABLE ON MOBILE */
+  .zoom-widget {
+    display: flex !important;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .zoom-badge {
+    min-width: 34px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-panel);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .dock-divider {
+    height: 16px;
+    margin: 0 1px;
+    flex-shrink: 0;
+  }
+
+  /* On mobile <= 680px, hide duplicate divider and download button so all dock controls fit cleanly */
+  .slider-container,
+  .slider-container + .dock-divider,
+  #btn-download,
+  .bottom-dock .dock-divider:last-of-type {
+    display: none !important;
+  }
+
+  /* Translucent floating side navigation arrows so text isn't obscured */
+  .nav-arrow-floating {
+    width: 36px;
+    height: 36px;
+    opacity: 0.35;
+    background: rgba(15, 23, 42, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .nav-arrow-floating svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .nav-arrow-floating:active {
+    opacity: 0.95;
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .nav-arrow-prev { left: 4px; }
+  .nav-arrow-next { right: 4px; }
+
+  /* Mobile Full-Screen Drawers */
+  .drawer-side {
+    left: 6px;
+    right: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: auto;
+    border-radius: var(--radius-lg);
+  }
+
+  .drawer-bottom {
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    height: 220px;
+    border-radius: var(--radius-lg);
+  }
+
+  .drawer-thumbnails-track {
+    height: 150px;
+    gap: 8px;
+  }
+
+  .thumb-card {
+    width: 85px;
+    height: 120px;
+  }
+}
+
+/* Extra Compact Mobile (Screens <= 360px, e.g. very small Androids) */
+@media (max-width: 360px) {
+  .top-bar {
+    padding: 0 4px;
+    gap: 2px;
+  }
+
+  .doc-title {
+    display: none !important; /* Show only book icon on ultra-narrow phones */
+  }
+
+  .top-bar-center {
+    gap: 2px;
+  }
+
+  .top-bar-right {
+    gap: 2px;
+  }
+
+  .top-bar .tool-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  .bottom-dock {
+    padding: 0 4px;
+    gap: 1px;
+  }
+
+  .bottom-dock .tool-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .page-jump-input {
+    width: 32px;
+    font-size: 11px;
+  }
+
+  /* Reset button can be hidden because tapping .zoom-badge resets zoom to 100% */
+  #btn-zoom-reset {
     display: none;
   }
 }
