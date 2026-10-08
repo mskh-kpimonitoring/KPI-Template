@@ -8,6 +8,10 @@
 (function () {
   'use strict';
 
+  const log = (...args) => console.log(...args);
+  const warn = (...args) => console.warn(...args);
+  const error = (...args) => console.error(...args);
+
   // Set PDF.js worker path
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdf.worker.min.js';
@@ -59,6 +63,7 @@
     tocFilter: 'all',
     tocSearchQuery: ''
   };
+  window.flipbookState = state;
 
   /* --------------------------------------------------------------------------
      2. Web Audio Realistic Paper Flip Synthesizer
@@ -138,6 +143,8 @@
   const dom = {
     appRoot: document.getElementById('app-root'),
     topBar: document.getElementById('top-bar'),
+    docTitle: document.getElementById('doc-title'),
+    docBadge: document.getElementById('doc-badge'),
     bottomDock: document.getElementById('bottom-dock'),
     stage: document.getElementById('stage-container'),
     bookViewport: document.getElementById('book-viewport'),
@@ -205,13 +212,26 @@
     loadSavedSettings();
     bindUserInteractions();
 
-    // Try auto-loading 'เล่ม.pdf'
-    try {
-      showLoadingToast('กำลังเปิดไฟล์ เล่ม.pdf...');
-      await loadPdfDocument('เล่ม.pdf');
-    } catch (err) {
-      console.warn('Auto-fetch failed (CORS or file access restriction):', err);
-      // Fallback: Reveal friendly drag-and-drop / file picker
+    showLoadingToast('กำลังเปิดไฟล์เอกสาร...');
+
+    // Try candidate paths: ASCII aliases routed by server ('doc.pdf', 'book.pdf') first to prevent
+    // Windows HTTP.SYS Thai URL corruption, then fallback to direct 'เล่ม.pdf' and URL-encoded.
+    const candidateUrls = ['doc.pdf', 'book.pdf', encodeURIComponent('เล่ม.pdf'), 'เล่ม.pdf'];
+    let loaded = false;
+
+    for (const url of candidateUrls) {
+      try {
+        await loadPdfDocument(url);
+        loaded = true;
+        break;
+      } catch (err) {
+        // Continue trying next candidate URL
+      }
+    }
+
+    if (!loaded) {
+      hideLoadingToast();
+      // Fallback: Reveal friendly drag-and-drop / file picker (works on file:// protocol too)
       dom.dropzoneOverlay.classList.remove('hidden');
     }
   }
@@ -219,8 +239,15 @@
   async function loadPdfDocument(source) {
     let loadingTask;
     if (typeof source === 'string') {
+      // Fetch via standard HTTP GET into ArrayBuffer to bypass HEAD/Range streaming issues
+      const response = await fetch(source);
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status} when fetching ${source}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const data = new Uint8Array(arrayBuffer);
       loadingTask = pdfjsLib.getDocument({
-        url: source,
+        data,
         cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
         cMapPacked: true
       });
@@ -236,6 +263,9 @@
     state.pdfDoc = await loadingTask.promise;
     state.totalPages = state.pdfDoc.numPages;
     dom.totalPages.textContent = state.totalPages;
+    if (dom.docBadge) {
+      dom.docBadge.textContent = `${state.totalPages} หน้า`;
+    }
     dom.pageSlider.max = state.totalPages;
     dom.pageInput.max = state.totalPages;
 
@@ -646,6 +676,7 @@
   async function loadTableOfContents() {
     if (window.FLIPBOOK_TOC && window.FLIPBOOK_TOC.length > 0) {
       state.tocItems = window.FLIPBOOK_TOC;
+      updateTocPillCounts();
       renderTableOfContents();
       setupTocListeners();
       return;
@@ -660,28 +691,43 @@
     if (outline && outline.length > 1) {
       renderOutlineTree(outline, dom.tocList);
     } else {
-      // Smart Fallback Milestones for 571 Pages
+      // Smart Fallback Milestones for 569 Pages
       const milestones = [
-        { title: 'หน้าปก (Cover)', page: 1, type: 'cover' },
-        { title: 'คำนำ (หน้า ก)', page: 2, type: 'preface' },
-        { title: 'สารบัญ (หน้า ข)', page: 3, type: 'toc' },
-        { title: 'ช่วงหน้า 50', page: 50, type: 'section' },
-        { title: 'ช่วงหน้า 100', page: 100, type: 'section' },
-        { title: 'ช่วงหน้า 150', page: 150, type: 'section' },
-        { title: 'ช่วงหน้า 200', page: 200, type: 'section' },
-        { title: 'ช่วงหน้า 250', page: 250, type: 'section' },
-        { title: 'ช่วงหน้า 300', page: 300, type: 'section' },
-        { title: 'ช่วงหน้า 350', page: 350, type: 'section' },
-        { title: 'ช่วงหน้า 400', page: 400, type: 'section' },
-        { title: 'ช่วงหน้า 450', page: 450, type: 'section' },
-        { title: 'ช่วงหน้า 500', page: 500, type: 'section' },
-        { title: 'ช่วงหน้า 550', page: 550, type: 'section' },
-        { title: 'หน้าสุดท้าย (Back Cover)', page: state.totalPages, type: 'cover' }
+        { title: 'หน้าปก (Cover)', page: 1, docPage: 'ปก', type: 'cover' },
+        { title: 'คำนำ (หน้า ก)', page: 2, docPage: 'ก', type: 'preface' },
+        { title: 'สารบัญ (หน้า ข)', page: 3, docPage: 'ข', type: 'toc' },
+        { title: 'ช่วงหน้า 50', page: 50, docPage: 33, type: 'section' },
+        { title: 'ช่วงหน้า 100', page: 100, docPage: 83, type: 'section' },
+        { title: 'ช่วงหน้า 150', page: 150, docPage: 133, type: 'section' },
+        { title: 'ช่วงหน้า 200', page: 200, docPage: 183, type: 'section' },
+        { title: 'ช่วงหน้า 250', page: 250, docPage: 233, type: 'section' },
+        { title: 'ช่วงหน้า 300', page: 300, docPage: 283, type: 'section' },
+        { title: 'ช่วงหน้า 350', page: 350, docPage: 333, type: 'section' },
+        { title: 'ช่วงหน้า 400', page: 400, docPage: 383, type: 'section' },
+        { title: 'ช่วงหน้า 450', page: 450, docPage: 433, type: 'section' },
+        { title: 'ช่วงหน้า 500', page: 500, docPage: 483, type: 'section' },
+        { title: 'ช่วงหน้า 550', page: 550, docPage: 533, type: 'section' },
+        { title: 'หน้าสุดท้าย (Back Cover)', page: state.totalPages, docPage: 552, type: 'cover' }
       ];
       state.tocItems = milestones;
+      updateTocPillCounts();
       renderTableOfContents();
       setupTocListeners();
     }
+  }
+
+  function updateTocPillCounts() {
+    if (!state.tocItems || !dom.filterPills) return;
+    const totalCount = state.tocItems.length;
+    const kpiCount = state.tocItems.filter(i => i.type === 'kpi').length;
+    const okrCount = state.tocItems.filter(i => i.type === 'okr').length;
+
+    dom.filterPills.forEach(pill => {
+      const f = pill.dataset.filter;
+      if (f === 'all') pill.textContent = `ทั้งหมด (${totalCount})`;
+      if (f === 'kpi') pill.textContent = `เฉพาะ KPI (${kpiCount})`;
+      if (f === 'okr') pill.textContent = `เฉพาะ OKR (${okrCount})`;
+    });
   }
 
   function renderTableOfContents() {
@@ -695,11 +741,12 @@
       if (filter === 'okr' && item.type !== 'okr') return false;
       if (filter === 'intro' && !['cover', 'preface', 'toc'].includes(item.type)) return false;
 
-      // Filter search
+      // Filter search (matches title, printed page, or PDF page)
       if (query) {
         const matchTitle = (item.title || '').toLowerCase().includes(query);
-        const matchPage = String(item.page).includes(query);
-        return matchTitle || matchPage;
+        const matchPdfPage = String(item.page).includes(query);
+        const matchDocPage = String(item.docPage || '').includes(query);
+        return matchTitle || matchPdfPage || matchDocPage;
       }
       return true;
     });
@@ -731,18 +778,24 @@
         badgeText = item.type === 'cover' ? 'ปก' : (item.type === 'preface' ? 'คำนำ' : (item.type === 'toc' ? 'สารบัญ' : 'หมวด'));
       }
 
+      const displayPage = item.docPage !== undefined ? `น. ${item.docPage}` : `น. ${item.page}`;
+      const pageTooltip = item.docPage !== undefined 
+        ? `หน้าในเล่ม: ${item.docPage} (หน้า PDF: ${item.page})` 
+        : `หน้า: ${item.page}`;
+
       li.innerHTML = `
         <div class="toc-item-left">
           <span class="toc-type-badge ${badgeClass}">${badgeText}</span>
           <span class="toc-item-title">${item.title}</span>
         </div>
-        <span class="toc-item-page">น. ${item.page}</span>
+        <span class="toc-item-page" title="${pageTooltip}">${displayPage}</span>
       `;
 
       li.addEventListener('click', () => {
         jumpToPage(item.page);
         closeAllDrawers();
-        showLoadingToast(`ไปยัง: ${item.title} (หน้า ${item.page})`, 2000);
+        const pageLabel = item.docPage !== undefined ? `หน้า ${item.docPage}` : `หน้า ${item.page}`;
+        showLoadingToast(`ไปยัง: ${item.title} (${pageLabel})`, 2000);
       });
 
       fragment.appendChild(li);
@@ -1314,7 +1367,16 @@
   function setupDropzone() {
     const dropCard = document.querySelector('.dropzone-card');
 
-    dropCard.addEventListener('click', () => dom.fileInput.click());
+    dropCard.addEventListener('click', (e) => {
+      // Don't trigger duplicate click if user clicked fileInput directly
+      if (e.target !== dom.fileInput) {
+        dom.fileInput.click();
+      }
+    });
+
+    dom.fileInput.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
 
     dom.fileInput.addEventListener('change', (e) => {
       if (e.target.files && e.target.files[0]) {
@@ -1330,7 +1392,7 @@
       });
     });
 
-    ['dragleave', 'drop'].forEach(eventName => {
+    ['dragleave'].forEach(eventName => {
       window.addEventListener(eventName, (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -1339,6 +1401,9 @@
     });
 
     window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropCard.classList.remove('drag-over');
       const dt = e.dataTransfer;
       if (dt && dt.files && dt.files[0]) {
         processUploadedFile(dt.files[0]);
@@ -1347,9 +1412,15 @@
   }
 
   function processUploadedFile(file) {
-    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+    const isPdf = (file.type && file.type === 'application/pdf') || 
+                  (file.name && file.name.toLowerCase().endsWith('.pdf'));
+    if (!isPdf) {
       alert('กรุณาเลือกไฟล์เอกสาร PDF เท่านั้น');
       return;
+    }
+
+    if (dom.docTitle) {
+      dom.docTitle.textContent = file.name;
     }
 
     showLoadingToast(`กำลังอ่านไฟล์ ${file.name}...`);
@@ -1368,6 +1439,14 @@
   /* --------------------------------------------------------------------------
      18. Toast Notification Utility
      -------------------------------------------------------------------------- */
+  function hideLoadingToast() {
+    const toast = document.getElementById('app-toast');
+    if (toast) {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(20px)';
+    }
+  }
+
   function showLoadingToast(msg, duration = 3000) {
     let toast = document.getElementById('app-toast');
     if (!toast) {

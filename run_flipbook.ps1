@@ -1,9 +1,15 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Lumina Flipbook - Zero-Dependency Local Static Server (PowerShell)
 # ==============================================================================
 
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 $port = 8080
 $rootDir = $PSScriptRoot
+
+# Find the PDF file in root directory (e.g. เล่ม.pdf)
+$pdfFile = Get-ChildItem -Path $rootDir -Filter *.pdf | Select-Object -First 1
+$pdfPath = if ($pdfFile) { $pdfFile.FullName } else { $null }
 
 # Check if port is in use, find next available if needed
 while ($true) {
@@ -25,7 +31,9 @@ $url = "http://localhost:$port/"
 Write-Host ""
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "   📖 Lumina Flipbook กำลังทำงานที่: $url" -ForegroundColor Green
-Write-Host "   เปิดเอกสาร: เล่ม.pdf (571 หน้า)" -ForegroundColor Yellow
+if ($pdfFile) {
+    Write-Host "   เปิดเอกสาร: $($pdfFile.Name)" -ForegroundColor Yellow
+}
 Write-Host "   กด Ctrl+C เพื่อหยุดการทำงาน" -ForegroundColor Gray
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host ""
@@ -45,42 +53,62 @@ $mimeTypes = @{
     ".svg"  = "image/svg+xml"
     ".woff" = "font/woff"
     ".woff2"= "font/woff2"
+    ".ico"  = "image/x-icon"
 }
 
 try {
     while ($listener.IsListening) {
-        $context = $listener.GetContext()
-        $request = $context.Request
-        $response = $context.Response
+        try {
+            $context = $listener.GetContext()
+            $request = $context.Request
+            $response = $context.Response
 
-        $relPath = [System.Uri]::UnescapeDataString($request.Url.LocalPath.TrimStart('/'))
-        if ([string]::IsNullOrWhiteSpace($relPath)) {
-            $relPath = "index.html"
-        }
-
-        $filePath = Join-Path $rootDir $relPath
-
-        if (Test-Path $filePath -PathType Leaf) {
-            $ext = [System.IO.Path]::GetExtension($filePath).ToLower()
-            $contentType = "application/octet-stream"
-            if ($mimeTypes.ContainsKey($ext)) {
-                $contentType = $mimeTypes[$ext]
+            $rawPath = $request.Url.LocalPath.TrimStart('/')
+            $relPath = [System.Uri]::UnescapeDataString($rawPath)
+            if ([string]::IsNullOrWhiteSpace($relPath)) {
+                $relPath = "index.html"
             }
 
-            $response.ContentType = $contentType
-            $response.AddHeader("Access-Control-Allow-Origin", "*")
-            $response.AddHeader("Cache-Control", "no-cache")
+            $filePath = Join-Path $rootDir $relPath
 
-            $bytes = [System.IO.File]::ReadAllBytes($filePath)
-            $response.ContentLength64 = $bytes.Length
-            $response.OutputStream.Write($bytes, 0, $bytes.Length)
-        } else {
-            $response.StatusCode = 404
-            $msg = [System.Text.Encoding]::UTF8.GetBytes("404 Not Found: $relPath")
-            $response.OutputStream.Write($msg, 0, $msg.Length)
+            # Smart PDF routing:
+            # Map book.pdf, doc.pdf, or any .pdf request (including mojibake from HTTP.sys) to the PDF file
+            if (-not (Test-Path $filePath -PathType Leaf) -and $pdfPath) {
+                if ($relPath -like "*.pdf" -or $rawPath -like "*.pdf" -or $relPath -match "\.pdf" -or $rawPath -match "\.pdf") {
+                    $filePath = $pdfPath
+                }
+            }
+
+            if (Test-Path $filePath -PathType Leaf) {
+                $ext = [System.IO.Path]::GetExtension($filePath).ToLower()
+                $contentType = "application/octet-stream"
+                if ($mimeTypes.ContainsKey($ext)) {
+                    $contentType = $mimeTypes[$ext]
+                }
+
+                $response.ContentType = $contentType
+                $response.StatusCode = 200
+                $response.AddHeader("Access-Control-Allow-Origin", "*")
+                $response.AddHeader("Accept-Ranges", "none")
+                $response.AddHeader("Cache-Control", "no-cache")
+
+                $bytes = [System.IO.File]::ReadAllBytes($filePath)
+                $response.ContentLength64 = $bytes.Length
+
+                # Only write body for non-HEAD requests to prevent ProtocolViolationException
+                if ($request.HttpMethod -ne "HEAD") {
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                }
+            } else {
+                $response.StatusCode = 404
+                $msg = [System.Text.Encoding]::UTF8.GetBytes("404 Not Found: $relPath")
+                $response.OutputStream.Write($msg, 0, $msg.Length)
+            }
+
+            $response.Close()
+        } catch {
+            # Safely continue loop on client connection drop or error
         }
-
-        $response.OutputStream.Close()
     }
 } finally {
     $listener.Stop()

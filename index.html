@@ -27,7 +27,7 @@
           </svg>
           <span class="doc-title" id="doc-title">เล่ม.pdf</span>
         </div>
-        <span class="doc-badge" id="doc-badge">571 หน้า</span>
+        <span class="doc-badge" id="doc-badge">569 หน้า</span>
       </div>
 
       <div class="top-bar-center">
@@ -166,8 +166,8 @@
       <!-- Page Jump Box -->
       <div class="page-jump-container">
         <span>หน้า</span>
-        <input type="number" id="page-input" class="page-jump-input" min="1" max="571" value="1" aria-label="หมายเลขหน้าที่ต้องการไป">
-        <span>/ <span id="total-pages">571</span></span>
+        <input type="number" id="page-input" class="page-jump-input" min="1" max="569" value="1" aria-label="หมายเลขหน้าที่ต้องการไป">
+        <span>/ <span id="total-pages">569</span></span>
       </div>
 
       <!-- Next Button -->
@@ -182,7 +182,7 @@
       <!-- Slider Track -->
       <div class="slider-container" id="slider-container">
         <div class="slider-tooltip" id="slider-tooltip">หน้า 1</div>
-        <input type="range" class="page-slider" id="page-slider" min="1" max="571" value="1" aria-label="แถบเลื่อนหน้า">
+        <input type="range" class="page-slider" id="page-slider" min="1" max="569" value="1" aria-label="แถบเลื่อนหน้า">
       </div>
 
       <div class="dock-divider"></div>
@@ -295,10 +295,10 @@
           <button id="toc-search-clear" class="toc-search-clear" aria-label="ล้างคำค้นหา" style="display: none;">&times;</button>
         </div>
         <div class="toc-filter-pills">
-          <button class="filter-pill active" data-filter="all">ทั้งหมด (428)</button>
-          <button class="filter-pill" data-filter="kpi">เฉพาะ KPI (128)</button>
-          <button class="filter-pill" data-filter="okr">เฉพาะ OKR (297)</button>
-          <button class="filter-pill" data-filter="intro">ส่วนนำ</button>
+          <button class="filter-pill active" data-filter="all">ทั้งหมด (429)</button>
+          <button class="filter-pill" data-filter="kpi">เฉพาะ KPI (125)</button>
+          <button class="filter-pill" data-filter="okr">เฉพาะ OKR (301)</button>
+          <button class="filter-pill" data-filter="intro">ส่วนนำ (3)</button>
         </div>
       </div>
       <div class="drawer-body">
@@ -402,6 +402,7 @@
 
     <!-- 6. DRAG & DROP / FILE PICKER FALLBACK (CORS-Proof) -->
     <div class="dropzone-overlay hidden" id="dropzone-overlay">
+      <input type="file" id="file-input" accept="application/pdf" style="display: none;">
       <div class="dropzone-card">
         <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -417,7 +418,6 @@
         <div class="dropzone-hint">
           💡 เคล็ดลับ: คุณสามารถดับเบิ้ลคลิกไฟล์ <code>run_flipbook.bat</code> ในโฟลเดอร์เพื่อเปิดอ่านอัตโนมัติโดยไม่ต้องเลือกไฟล์
         </div>
-        <input type="file" id="file-input" accept="application/pdf" style="display: none;">
       </div>
     </div>
 

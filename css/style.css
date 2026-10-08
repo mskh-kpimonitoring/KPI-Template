@@ -908,6 +908,12 @@ input {
   gap: var(--space-1);
   overflow-x: auto;
   padding-bottom: 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.toc-filter-pills::-webkit-scrollbar {
+  display: none;
 }
 
 .filter-pill {
