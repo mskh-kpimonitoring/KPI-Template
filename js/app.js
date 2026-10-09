@@ -216,7 +216,26 @@
 
     // Try candidate paths: ASCII aliases routed by server ('doc.pdf', 'book.pdf') first to prevent
     // Windows HTTP.SYS Thai URL corruption, then fallback to direct 'เล่ม.pdf' and URL-encoded.
-    const candidateUrls = ['doc.pdf', 'book.pdf', encodeURIComponent('เล่ม.pdf'), 'เล่ม.pdf'];
+    const candidateUrls = [
+      'doc.pdf',
+      'book.pdf',
+      encodeURIComponent('เล่ม.pdf'),
+      'เล่ม.pdf'
+    ];
+
+    // If hosted on GitHub Pages, add raw.githubusercontent fallback URLs in case GitHub Pages returns 404 for Thai filenames
+    if (window.location && window.location.hostname && window.location.hostname.endsWith('github.io')) {
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      if (pathParts.length > 0) {
+        const repo = pathParts[0];
+        const org = window.location.hostname.split('.')[0];
+        candidateUrls.push(
+          `https://raw.githubusercontent.com/${org}/${repo}/main/doc.pdf`,
+          `https://raw.githubusercontent.com/${org}/${repo}/main/${encodeURIComponent('เล่ม.pdf')}`
+        );
+      }
+    }
+
     let loaded = false;
 
     for (const url of candidateUrls) {
@@ -261,6 +280,7 @@
     }
 
     state.pdfDoc = await loadingTask.promise;
+    state.loadedPdfUrl = typeof source === 'string' ? source : null;
     state.totalPages = state.pdfDoc.numPages;
     dom.totalPages.textContent = state.totalPages;
     if (dom.docBadge) {
@@ -1225,7 +1245,7 @@
     // Download
     dom.btnDownload.addEventListener('click', () => {
       const a = document.createElement('a');
-      a.href = 'เล่ม.pdf';
+      a.href = state.loadedPdfUrl || 'doc.pdf';
       a.download = 'เล่ม.pdf';
       a.click();
     });
